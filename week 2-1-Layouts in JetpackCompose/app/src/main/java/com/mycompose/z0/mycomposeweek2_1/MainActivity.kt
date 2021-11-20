@@ -18,20 +18,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.focusModifier
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.AlignmentLine
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.layout
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.*
+import androidx.constraintlayout.compose.layoutId
 import coil.compose.ImagePainter.State.Empty.painter
 import coil.compose.rememberImagePainter
 import com.mycompose.z0.mycomposeweek2_1.ui.theme.MyComposeWeek21Theme
+import kotlinx.coroutines.NonDisposableHandle.parent
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -44,6 +44,106 @@ class MainActivity : ComponentActivity() {
                     BodyContent()
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ConstraintLayoutContent() {
+    ConstraintLayout {
+
+        val (button1, button2, text) = createRefs()
+
+        Button(
+            onClick = { },
+            modifier = Modifier.constrainAs(button1) {
+                top.linkTo(parent.top, margin = 16.dp)
+            }
+        ) {
+            Text("Button 1")
+        }
+
+        Text("Text", Modifier.constrainAs(text) {
+            top.linkTo(button1.bottom, margin = 16.dp)
+            centerAround(button1.end) // button1이 끝나는 지점을 text의 중앙으로
+        })
+        val barrier = createEndBarrier(button1, text)
+        Button(
+            onClick = { },
+            modifier = Modifier.constrainAs(button2) {
+                top.linkTo(parent.top, margin = 16.dp)
+                start.linkTo(barrier)
+            }
+        ) {
+            Text("Button 2")
+        }
+
+    }
+}
+
+@Preview
+@Composable
+fun ConstraintLayoutContentPreview() {
+    MyComposeWeek21Theme {
+        ConstraintLayoutContent()
+    }
+}
+
+@Composable
+fun LargeConstraintLayout() {
+    ConstraintLayout {
+        val text = createRef()
+
+        val guideline = createGuidelineFromStart(fraction = 0.5f)
+        Text(
+            "This is a very very very very very very very long text",
+            Modifier.constrainAs(text) {
+                linkTo(start = guideline, end = parent.end)
+                width = Dimension.preferredWrapContent.atLeast(100.dp)
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun DecoupledConstraintLayoutPreview() {
+    MyComposeWeek21Theme {
+        DecoupledConstraintLayout()
+    }
+}
+
+@Composable
+fun DecoupledConstraintLayout() {
+    BoxWithConstraints {
+        val constraints = if (maxWidth < maxHeight) {
+            decoupledConstraints(margin = 16.dp)
+        } else {
+            decoupledConstraints(margin = 32.dp)
+        }
+        ConstraintLayout(constraints) {
+            Button(
+                onClick = { },
+                modifier = Modifier.layoutId("button")
+            ) {
+                Text("Button")
+            }
+
+            Text("Text", Modifier.layoutId("text"))
+        }
+    }
+}
+
+private fun decoupledConstraints(margin: Dp): ConstraintSet {
+    return ConstraintSet {
+        val button = createRefFor("button")
+        val text = createRefFor("text")
+
+        constrain(button) {
+            top.linkTo(parent.top, margin = margin)
+        }
+        constrain(text) {
+            top.linkTo(button.bottom, margin = margin)
         }
     }
 }
