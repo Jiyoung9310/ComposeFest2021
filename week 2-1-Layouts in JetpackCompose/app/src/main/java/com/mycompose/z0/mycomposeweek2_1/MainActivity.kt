@@ -18,20 +18,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.*
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.*
-import androidx.constraintlayout.compose.layoutId
-import coil.compose.ImagePainter.State.Empty.painter
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.ConstraintSet
+import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.atLeast
 import coil.compose.rememberImagePainter
 import com.mycompose.z0.mycomposeweek2_1.ui.theme.MyComposeWeek21Theme
-import kotlinx.coroutines.NonDisposableHandle.parent
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -41,9 +39,40 @@ class MainActivity : ComponentActivity() {
             MyComposeWeek21Theme {
                 // A surface container using the 'background' color from the theme
                 Surface {
-                    BodyContent()
+                    TwoTexts(text1 = "Hi", text2 = "there")
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun TwoTexts(modifier: Modifier = Modifier, text1: String, text2: String) {
+    Row(modifier = modifier.height(IntrinsicSize.Min)) {
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 4.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally),
+            text = text1
+        )
+        Divider(color = Color.Black, modifier = Modifier.fillMaxHeight().width(1.dp))
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 4.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally),
+
+            text = text2
+        )
+    }
+}
+@Preview
+@Composable
+fun TwoTextsPreview() {
+    MyComposeWeek21Theme {
+        Surface {
+            TwoTexts(text1 = "Hi", text2 = "there")
         }
     }
 }
