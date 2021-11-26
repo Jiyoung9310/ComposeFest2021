@@ -49,7 +49,7 @@ fun TodoScreen(
 ) {
     Column {
         TodoItemInputBackground(elevate = true, modifier = Modifier.fillMaxWidth()) {
-            TodoItemInput(onItemComplete = onAddItem)
+            TodoItemEntryInput(onItemComplete = onAddItem)
         }
         LazyColumn(
             modifier = Modifier.weight(1f),
@@ -105,7 +105,7 @@ private fun randomTint(): Float {
 }
 
 @Composable
-fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
+fun TodoItemEntryInput(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
     val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
     val iconsVisible = text.isNotBlank()
@@ -115,6 +115,18 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         setText("")
     }
 
+    TodoItemInput(text, setText, icon, setIcon, submit, iconsVisible)
+}
+
+@Composable
+fun TodoItemInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+    icon: TodoIcon,
+    onIconChange: (TodoIcon) -> Unit,
+    submit: () -> Unit,
+    iconsVisible: Boolean
+) {
     Column {
         Row(
             Modifier
@@ -123,7 +135,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
         ) {
             TodoInputText(
                 text = text,
-                onTextChange = setText,
+                onTextChange = onTextChange,
                 modifier = Modifier
                     .weight(1f)
                     .padding(end = 8.dp),
@@ -136,8 +148,12 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
                 enabled = text.isNotBlank()
             )
         }
-        if(iconsVisible) {
-            AnimatedIconRow(icon = icon, onIconChange = setIcon, modifier = Modifier.padding(8.dp))
+        if (iconsVisible) {
+            AnimatedIconRow(
+                icon = icon,
+                onIconChange = onIconChange,
+                modifier = Modifier.padding(8.dp)
+            )
         } else {
             Spacer(modifier = Modifier.height(16.dp))
         }
@@ -146,7 +162,7 @@ fun TodoItemInput(onItemComplete: (TodoItem) -> Unit) {
 
 @Preview
 @Composable
-fun PreviewTodoItemInput() = TodoItemInput(onItemComplete = {})
+fun PreviewTodoItemInput() = TodoItemEntryInput(onItemComplete = {})
 
 @Preview
 @Composable
