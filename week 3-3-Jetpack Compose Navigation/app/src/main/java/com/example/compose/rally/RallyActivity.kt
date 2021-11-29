@@ -74,56 +74,57 @@ fun RallyApp() {
                 )
             }
         ) { innerPadding ->
-            NavHost(
-                navController = navController,
-                startDestination = RallyScreen.Overview.name,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                val accountsName = RallyScreen.Accounts.name
-                composable(
-                    route = "$accountsName/{name}",
-                    arguments = listOf(
-                        navArgument("name") {
-                            type = NavType.StringType
-                        }
-                    ),
-                    deepLinks =  listOf(navDeepLink {
-                        uriPattern = "rally://$accountsName/{name}"
-                    })
-                ) { entry ->
-                    val accountName = entry.arguments?.getString("name")
-                    val account = UserData.getAccount(accountName)
-                    SingleAccountBody(account = account)
-                }
+            RallyNavHost(navController, Modifier.padding(innerPadding))
+        }
+    }
+}
 
-                composable(RallyScreen.Overview.name) {
-                    OverviewBody(
-                        onClickSeeAllAccounts = { navController.navigate(RallyScreen.Accounts.name) },
-                        onClickSeeAllBills = { navController.navigate(RallyScreen.Bills.name) },
-                        onAccountClick = { name ->
-                            navigateToSingleAccount(navController, name)
-                        },
-                    )
+@Composable
+fun RallyNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    NavHost(
+        navController = navController,
+        startDestination = RallyScreen.Overview.name,
+        modifier = modifier
+    ) {
+        val accountsName = RallyScreen.Accounts.name
+        composable(
+            route = "$accountsName/{name}",
+            arguments = listOf(
+                navArgument("name") {
+                    type = NavType.StringType
                 }
-                composable(RallyScreen.Accounts.name) {
-                    AccountsBody(accounts = UserData.accounts) { name ->
-                        navigateToSingleAccount(
-                            navController = navController,
-                            accountName = name
-                        )
-                    }
-                }
-                composable(RallyScreen.Bills.name) {
-                    BillsBody(bills = UserData.bills)
-                }
-            }
-            /*Box(Modifier.padding(innerPadding)) {
-                currentScreen.content(
-                    onScreenChange = { screen ->
-                        currentScreen = RallyScreen.valueOf(screen)
-                    }
+            ),
+            deepLinks =  listOf(navDeepLink {
+                uriPattern = "rally://$accountsName/{name}"
+            })
+        ) { entry ->
+            val accountName = entry.arguments?.getString("name")
+            val account = UserData.getAccount(accountName)
+            SingleAccountBody(account = account)
+        }
+
+        composable(RallyScreen.Overview.name) {
+            OverviewBody(
+                onClickSeeAllAccounts = { navController.navigate(RallyScreen.Accounts.name) },
+                onClickSeeAllBills = { navController.navigate(RallyScreen.Bills.name) },
+                onAccountClick = { name ->
+                    navigateToSingleAccount(navController, name)
+                },
+            )
+        }
+        composable(RallyScreen.Accounts.name) {
+            AccountsBody(accounts = UserData.accounts) { name ->
+                navigateToSingleAccount(
+                    navController = navController,
+                    accountName = name
                 )
-            }*/
+            }
+        }
+        composable(RallyScreen.Bills.name) {
+            BillsBody(bills = UserData.bills)
         }
     }
 }
