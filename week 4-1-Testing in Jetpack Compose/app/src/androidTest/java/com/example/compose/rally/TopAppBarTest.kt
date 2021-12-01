@@ -50,4 +50,14 @@ class TopAppBarTest {
             .assertExists()
 
     }
+
+    @Test
+    fun rallyTopAppBarTest_tabChanged() {
+        composeTestRule.setContent {
+            RallyApp()
+        }
+        composeTestRule.onNodeWithContentDescription(RallyScreen.Bills.name).performClick()
+
+        composeTestRule.onNodeWithContentDescription(RallyScreen.Bills.name).assertIsSelected()
+    }
 }
